@@ -15,8 +15,10 @@ import colors from "@/styles/colors";
 import { useNavigation } from "@react-navigation/core";
 import { useState } from "react";
 import { Button } from "@/components/Button";
+import { useAuth } from "@/hooks";
 
 export function UserIdentification() {
+    const { handleAuth } = useAuth();
     const navigator = useNavigation();
 
     const [name, setName] = useState('');
@@ -37,18 +39,25 @@ export function UserIdentification() {
         setName(value);
     }
 
-    function handleSubmit() {
+    async function handleSubmit() {
         if (!name) {
             return Alert.alert("Me diz ai como se chama!");
         }
 
-        navigator.navigate('Confirmation', {
-            title: 'Prontinho',
-            buttonTitle: 'Começar',
-            icon: 'smile',
-            nextScreen: 'PlantSelect',
-            subtitle: 'Agora vamos começar a cuidar das suas plantinhas com muito cuidado.'
-        });
+        try {
+            await handleAuth({name});
+
+            navigator.navigate('Confirmation', {
+                title: 'Prontinho',
+                buttonTitle: 'Começar',
+                icon: 'smile',
+                nextScreen: 'PlantSelect',
+                subtitle: 'Agora vamos começar a cuidar das suas plantinhas com muito cuidado.'
+            });
+        } catch (error) {
+            Alert.alert('Não foi possível salvar o seu nome!');
+        }
+
     }
 
     return (
